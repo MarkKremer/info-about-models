@@ -1,0 +1,34 @@
+{
+    "name": "markkremer/info-about-models",
+    "description": "Get information about a model class through reflection and static analysis",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Mark Kremer",
+            "email": "mail@markkremer.nl"
+        }
+    ],
+    "require": {
+        "nikic/php-parser": "^4.3"
+    },
+    "require-dev": {
+        "orchestra/testbench": "^4.6",
+        "matt-allan/laravel-code-style": "^0.5.1"
+    },
+    "autoload": {
+        "psr-4": {
+            "MarkKremer\\InfoAboutModels\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "MarkKremer\\InfoAboutModels\\Tests\\": "tests/",
+            "MarkKremer\\InfoAboutModels\\Tests\\Code\\": "tests/code/"
+        }
+    },
+    "scripts": {
+        "check-style": "php-cs-fixer fix --dry-run --diff",
+        "fix-style": "php-cs-fixer fix"
+    }
+}
