@@ -38,5 +38,5 @@ use App\Models\User;
 use MarkKremer\InfoAboutModels\ModelParser;
 
 $userModelInfo = (new ModelParser)->parseClass(User::class);
-var_dump($userModelInfo));
+var_dump($userModelInfo);
 ```
