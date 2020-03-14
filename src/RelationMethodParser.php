@@ -19,7 +19,6 @@ use PhpParser\ConstExprEvaluator;
 use PhpParser\Node;
 use PhpParser\Node\Arg;
 use PhpParser\Node\Expr;
-use PhpParser\Node\Expr\ClassConstFetch;
 use PhpParser\Node\Expr\MethodCall;
 use PhpParser\Node\Expr\Variable;
 use PhpParser\Node\Identifier;
@@ -31,6 +30,8 @@ use PhpParser\NodeVisitorAbstract;
 
 class RelationMethodParser
 {
+    use MakesEvaluator;
+
     private $eloquentHelperMethods = [
         'hasOne'         => true,
         'hasMany'        => true,
@@ -386,21 +387,5 @@ class RelationMethodParser
         $class->hasUnknownsOrLogic = $this->relation->hasUnknownsOrLogic;
 
         $this->relation = $class;
-    }
-
-    private function makeEvaluator(): ConstExprEvaluator
-    {
-        return new ConstExprEvaluator(function (Expr $expr) {
-            if ($expr instanceof ClassConstFetch) {
-                return $this->fetchClassConstant($expr);
-            }
-
-            throw new ConstExprEvaluationException("Expression of type {$expr->getType()} cannot be evaluated");
-        });
-    }
-
-    private function fetchClassConstant(ClassConstFetch $classConstFetch): string
-    {
-        return $classConstFetch->class->toString();
     }
 }

@@ -14,9 +14,12 @@ use MarkKremer\InfoAboutModels\Relations\UnsupportedRelation;
 use MarkKremer\InfoAboutModels\Tests\Code\Bar;
 use MarkKremer\InfoAboutModels\Tests\Code\Foo;
 use MarkKremer\InfoAboutModels\Tests\Code\ModelExtendsModelWithDefaultRelations;
+use MarkKremer\InfoAboutModels\Tests\Code\ModelExtendsModelWithExplicitTable;
+use MarkKremer\InfoAboutModels\Tests\Code\ModelExtendsModelWithExplicitTableAndDefinesTableItself;
 use MarkKremer\InfoAboutModels\Tests\Code\ModelWithCommentInRelation;
 use MarkKremer\InfoAboutModels\Tests\Code\ModelWithDefaultRelations;
 use MarkKremer\InfoAboutModels\Tests\Code\ModelWithExplicitRelations;
+use MarkKremer\InfoAboutModels\Tests\Code\ModelWithExplicitTable;
 use MarkKremer\InfoAboutModels\Tests\Code\ModelWithTrait;
 use MarkKremer\InfoAboutModels\Tests\Code\ModelWithUnsupportedRelation;
 use Orchestra\Testbench\TestCase;
@@ -42,6 +45,46 @@ class TestModelParser extends TestCase
         $model = (new ModelParser())->parseClass(Foo::class);
 
         $this->assertEquals(Foo::class, $model->class);
+    }
+
+    /**
+     * @test
+     */
+    public function it_can_parse_the_table_name()
+    {
+        $model = (new ModelParser())->parseClass(ModelWithExplicitTable::class);
+
+        $this->assertEquals('explicit_table', $model->table);
+    }
+
+    /**
+     * @test
+     */
+    public function it_can_parse_the_table_name_from_the_parent_class()
+    {
+        $model = (new ModelParser())->parseClass(ModelExtendsModelWithExplicitTable::class);
+
+        $this->assertEquals('explicit_table', $model->table);
+    }
+
+    /**
+     * @test
+     */
+    public function it_uses_the_table_name_in_the_child_class_if_both_the_parent_and_child_define_it()
+    {
+        $model = (new ModelParser())->parseClass(ModelExtendsModelWithExplicitTableAndDefinesTableItself::class);
+
+        $this->assertEquals('own_table', $model->table);
+    }
+
+    /**
+     * @test
+     */
+    public function it_can_get_the_default_table_name_if_none_is_defined()
+    {
+        $model = (new ModelParser())->parseClass(Foo::class);
+
+        $this->assertEquals('foos', $model->table);
     }
 
     /**

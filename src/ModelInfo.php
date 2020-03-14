@@ -18,6 +18,11 @@ class ModelInfo
     public $class;
 
     /**
+     * @var string
+     */
+    public $table;
+
+    /**
      * @var Collection|Relation[]
      */
     public $relations;

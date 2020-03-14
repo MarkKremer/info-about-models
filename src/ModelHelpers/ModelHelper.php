@@ -5,6 +5,15 @@ namespace MarkKremer\InfoAboutModels\ModelHelpers;
 interface ModelHelper
 {
     /**
+     * Get the table name for the model.
+     *
+     * @param string $model
+     *
+     * @return string
+     */
+    public function getTable(string $model): string;
+
+    /**
      * Get the default foreign key name for the model.
      *
      * @param string $model

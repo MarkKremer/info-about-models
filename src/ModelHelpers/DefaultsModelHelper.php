@@ -9,6 +9,14 @@ class DefaultsModelHelper implements ModelHelper
     /**
      * {@inheritdoc}
      */
+    public function getTable(string $model): string
+    {
+        return Str::snake(Str::pluralStudly(class_basename($model)));
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function getForeignKey(string $model): string
     {
         return Str::snake(class_basename($model)).'_'.$this->getKeyName($model);

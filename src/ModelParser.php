@@ -5,10 +5,16 @@ namespace MarkKremer\InfoAboutModels;
 use Exception;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
+use MarkKremer\InfoAboutModels\ModelHelpers\DefaultsModelHelper;
+use MarkKremer\InfoAboutModels\ModelHelpers\ModelHelper;
 use MarkKremer\InfoAboutModels\Relations\Relation;
+use PhpParser\ConstExprEvaluationException;
+use PhpParser\ConstExprEvaluator;
 use PhpParser\Node;
+use PhpParser\Node\Stmt;
 use PhpParser\Node\Stmt\ClassLike;
 use PhpParser\Node\Stmt\ClassMethod;
+use PhpParser\Node\Stmt\PropertyProperty;
 use PhpParser\NodeFinder;
 use PhpParser\NodeTraverser;
 use PhpParser\NodeVisitor\NameResolver;
@@ -18,14 +24,28 @@ use ReflectionException;
 
 class ModelParser
 {
+    use MakesEvaluator;
+
     /**
      * @var NodeFinder
      */
     private $nodeFinder;
 
+    /**
+     * @var ConstExprEvaluator
+     */
+    private $evaluator;
+
+    /**
+     * @var ModelHelper
+     */
+    private $modelHelper;
+
     public function __construct()
     {
         $this->nodeFinder = new NodeFinder();
+        $this->evaluator = $this->makeEvaluator();
+        $this->modelHelper = new DefaultsModelHelper();
     }
 
     /**
@@ -38,7 +58,14 @@ class ModelParser
      */
     public function parseClass(string $className): ModelInfo
     {
-        return $this->parseClassAsPartOfConcreteClass($className, $className);
+        $model = $this->parseClassAsPartOfConcreteClass($className, $className);
+
+        // Set defaults
+        if ($model->table === null) {
+            $model->table = $this->modelHelper->getTable($className);
+        }
+
+        return $model;
     }
 
     /**
@@ -63,18 +90,20 @@ class ModelParser
         $model = new ModelInfo();
         $model->name = $reflectionClass->getShortName();
         $model->class = $reflectionClass->getName();
+        $model->table = $this->parsePropertyDefault($classAst, 'table');
         $model->relations = $this->parseRelations($classAst, $concreteClassName);
-
-        $parentClass = $reflectionClass->getParentClass();
-        if ($parentClass !== false && $parentClass->name !== Model::class) {
-            $parentModel = $this->parseClassAsPartOfConcreteClass($parentClass->getName(), $concreteClassName);
-            $model->relations = $model->relations->merge($parentModel->relations)->unique('name');
-        }
 
         $traits = $reflectionClass->getTraits();
         foreach ($traits as $trait) {
             $traitModel = $this->parseClassAsPartOfConcreteClass($trait->getName(), $concreteClassName);
             $model->relations = $model->relations->merge($traitModel->relations)->unique('name');
+        }
+
+        $parentClass = $reflectionClass->getParentClass();
+        if ($parentClass !== false && $parentClass->name !== Model::class) {
+            $parentModel = $this->parseClassAsPartOfConcreteClass($parentClass->getName(), $concreteClassName);
+            $model->table = $model->table ?: $parentModel->table;
+            $model->relations = $model->relations->merge($parentModel->relations)->unique('name');
         }
 
         return $model;
@@ -149,6 +178,41 @@ class ModelParser
         return collect($classes)->first(function (ClassLike $class) use ($className): bool {
             return $class->namespacedName->toString() === $className;
         });
+    }
+
+    /**
+     * @param ClassLike $class
+     * @param string    $propertyName
+     *
+     * @return mixed|null
+     */
+    private function parsePropertyDefault(ClassLike $class, string $propertyName)
+    {
+        $properties = $this->nodeFinder->findInstanceOf($class, PropertyProperty::class);
+
+        $property = collect($properties)->first(function (PropertyProperty $property) use ($propertyName) {
+            return $property->name->name === $propertyName;
+        });
+
+        return $this->evaluateProperty($property);
+    }
+
+    /**
+     * @param PropertyProperty|null $property
+     *
+     * @return mixed|null
+     */
+    private function evaluateProperty(?PropertyProperty $property)
+    {
+        if ($property === null) {
+            return null;
+        }
+
+        try {
+            return $this->evaluator->evaluateSilently($property->default);
+        } catch (ConstExprEvaluationException $e) {
+            return null;
+        }
     }
 
     private function parseRelations(ClassLike $class, string $concreteClassName): Collection
