@@ -7,6 +7,11 @@ class Relation
     /**
      * @var string
      */
+    public $model;
+
+    /**
+     * @var string
+     */
     public $name;
 
     /**

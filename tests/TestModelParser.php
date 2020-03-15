@@ -95,6 +95,7 @@ class TestModelParser extends TestCase
         $model = (new ModelParser())->parseClass(ModelWithDefaultRelations::class);
 
         $expected = new HasOne();
+        $expected->model = ModelWithDefaultRelations::class;
         $expected->name = 'hasOneRelation';
         $expected->relatedClass = Foo::class;
         $expected->foreignKey = 'model_with_default_relations_id';
@@ -134,6 +135,7 @@ class TestModelParser extends TestCase
         $eloquentRelation = (new $modelClass)->$relationName();
 
         $relation = new HasOne();
+        $relation->model = $modelClass;
         $relation->name = $relationName;
         $relation->relatedClass = get_class($eloquentRelation->getRelated());
         $relation->foreignKey = $eloquentRelation->getForeignKeyName();
@@ -151,6 +153,7 @@ class TestModelParser extends TestCase
         $model = (new ModelParser())->parseClass(ModelWithDefaultRelations::class);
 
         $expected = new HasMany();
+        $expected->model = ModelWithDefaultRelations::class;
         $expected->name = 'hasManyRelation';
         $expected->relatedClass = Foo::class;
         $expected->foreignKey = 'model_with_default_relations_id';
@@ -190,6 +193,7 @@ class TestModelParser extends TestCase
         $eloquentRelation = (new $modelClass)->$relationName();
 
         $relation = new HasMany();
+        $relation->model = $modelClass;
         $relation->name = $relationName;
         $relation->relatedClass = get_class($eloquentRelation->getRelated());
         $relation->foreignKey = $eloquentRelation->getForeignKeyName();
@@ -207,6 +211,7 @@ class TestModelParser extends TestCase
         $model = (new ModelParser())->parseClass(ModelWithDefaultRelations::class);
 
         $expected = new HasOneThrough();
+        $expected->model = ModelWithDefaultRelations::class;
         $expected->name = 'hasOneThroughRelation';
         $expected->relatedClass = Foo::class;
         $expected->through = Bar::class;
@@ -249,6 +254,7 @@ class TestModelParser extends TestCase
         $eloquentRelation = (new $modelClass)->$relationName();
 
         $relation = new HasOneThrough();
+        $relation->model = $modelClass;
         $relation->name = $relationName;
         $relation->relatedClass = get_class($eloquentRelation->getRelated());
         $relation->through = get_class($eloquentRelation->getParent());
@@ -269,6 +275,7 @@ class TestModelParser extends TestCase
         $model = (new ModelParser())->parseClass(ModelWithDefaultRelations::class);
 
         $expected = new HasManyThrough();
+        $expected->model = ModelWithDefaultRelations::class;
         $expected->name = 'hasManyThroughRelation';
         $expected->relatedClass = Foo::class;
         $expected->through = Bar::class;
@@ -311,6 +318,7 @@ class TestModelParser extends TestCase
         $eloquentRelation = (new $modelClass)->$relationName();
 
         $relation = new HasManyThrough();
+        $relation->model = $modelClass;
         $relation->name = $relationName;
         $relation->relatedClass = get_class($eloquentRelation->getRelated());
         $relation->through = get_class($eloquentRelation->getParent());
@@ -331,6 +339,7 @@ class TestModelParser extends TestCase
         $model = (new ModelParser())->parseClass(ModelWithDefaultRelations::class);
 
         $expected = new BelongsTo();
+        $expected->model = ModelWithDefaultRelations::class;
         $expected->name = 'belongsToRelation';
         $expected->relatedClass = Foo::class;
         $expected->foreignKey = 'belongs_to_relation_id';
@@ -371,6 +380,7 @@ class TestModelParser extends TestCase
         $eloquentRelation = (new $modelClass)->$relationName();
 
         $relation = new BelongsTo();
+        $relation->model = $modelClass;
         $relation->name = $relationName;
         $relation->relatedClass = get_class($eloquentRelation->getRelated());
         $relation->foreignKey = $eloquentRelation->getForeignKeyName();
@@ -389,6 +399,7 @@ class TestModelParser extends TestCase
         $model = (new ModelParser())->parseClass(ModelWithDefaultRelations::class);
 
         $expected = new BelongsToMany();
+        $expected->model = ModelWithDefaultRelations::class;
         $expected->name = 'belongsToManyRelation';
         $expected->relatedClass = Foo::class;
         $expected->table = 'foo_model_with_default_relations';
@@ -432,6 +443,7 @@ class TestModelParser extends TestCase
         $eloquentRelation = (new $modelClass)->$relationName();
 
         $relation = new BelongsToMany();
+        $relation->model = $modelClass;
         $relation->name = $relationName;
         $relation->relatedClass = get_class($eloquentRelation->getRelated());
         $relation->table = $eloquentRelation->getTable();
@@ -453,6 +465,7 @@ class TestModelParser extends TestCase
         $model = (new ModelParser())->parseClass(ModelWithUnsupportedRelation::class);
 
         $expected = new UnsupportedRelation();
+        $expected->model = ModelWithUnsupportedRelation::class;
         $expected->name = 'morphToRelation';
         $expected->relatedClass = null;
         $expected->hasUnknownsOrLogic = true;
@@ -468,6 +481,7 @@ class TestModelParser extends TestCase
         $model = (new ModelParser())->parseClass(ModelWithCommentInRelation::class);
 
         $expected = new HasOne();
+        $expected->model = ModelWithCommentInRelation::class;
         $expected->name = 'hasOneRelation';
         $expected->relatedClass = Foo::class;
         $expected->foreignKey = 'model_with_comment_in_relation_id';
@@ -485,6 +499,7 @@ class TestModelParser extends TestCase
         $model = (new ModelParser())->parseClass(ModelExtendsModelWithDefaultRelations::class);
 
         $expected = new HasOneThrough();
+        $expected->model = ModelExtendsModelWithDefaultRelations::class;
         $expected->name = 'hasOneThroughRelation';
         $expected->relatedClass = Foo::class;
         $expected->through = Bar::class;
@@ -517,6 +532,7 @@ class TestModelParser extends TestCase
         $model = (new ModelParser())->parseClass(ModelExtendsModelWithDefaultRelations::class);
 
         $expected = new HasOne();
+        $expected->model = ModelExtendsModelWithDefaultRelations::class;
         $expected->name = 'modelsOwnHasOneRelation';
         $expected->relatedClass = Foo::class;
         $expected->foreignKey = 'model_extends_model_with_default_relations_id';
@@ -534,6 +550,7 @@ class TestModelParser extends TestCase
         $model = (new ModelParser())->parseClass(ModelExtendsModelWithDefaultRelations::class);
 
         $expected = new HasMany();
+        $expected->model = ModelExtendsModelWithDefaultRelations::class;
         $expected->name = 'hasManyRelation';
         $expected->relatedClass = Foo::class;
         $expected->foreignKey = 'model_uuid';
@@ -561,6 +578,7 @@ class TestModelParser extends TestCase
         $model = (new ModelParser())->parseClass(ModelWithTrait::class);
 
         $expected = new HasOne();
+        $expected->model = ModelWithTrait::class;
         $expected->name = 'traitRelation';
         $expected->relatedClass = Foo::class;
         $expected->foreignKey = 'model_with_trait_id';
@@ -578,6 +596,7 @@ class TestModelParser extends TestCase
         $model = (new ModelParser())->parseClass(ModelWithTrait::class);
 
         $expected = new HasOne();
+        $expected->model = ModelWithTrait::class;
         $expected->name = 'hasOneRelation';
         $expected->relatedClass = Foo::class;
         $expected->foreignKey = 'model_with_trait_id';

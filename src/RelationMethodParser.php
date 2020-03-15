@@ -97,6 +97,7 @@ class RelationMethodParser
         $this->evaluator = $this->makeEvaluator();
         $this->modelHelper = new DefaultsModelHelper();
         $this->relation = new Relation();
+        $this->relation->model = $concreteClassName;
 
         $this->parseName();
         $this->parseArguments();
@@ -382,6 +383,7 @@ class RelationMethodParser
             throw new Exception("$className does not extend from Relation.");
         }
 
+        $class->model = $this->relation->model;
         $class->name = $this->relation->name;
         $class->relatedClass = $this->relation->relatedClass;
         $class->hasUnknownsOrLogic = $this->relation->hasUnknownsOrLogic;
